@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# Copyright (c) 2025, b»robotized
+# Copyright (c) 2025, Mathias Fuhrer
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -82,10 +82,15 @@ def main():
     # filename_reduced = "trajectory_20250716_101518_reduced_LIN.csv"
     # mode = "cartesian"
 
-    filename_planned = "trajectory_20250716_101907_planned.csv"
-    filename_executed = "trajectory_20250716_101907_executed.csv"
-    filename_reduced = "trajectory_20250716_101907_reduced_LIN.csv"
-    mode = "cartesian"
+    # filename_planned = "trajectory_20250716_101907_planned.csv"
+    # filename_executed = "trajectory_20250716_101907_executed.csv"
+    # filename_reduced = "trajectory_20250716_101907_reduced_LIN.csv"
+    # mode = "cartesian"
+
+    filename_planned = "trajectory_20250721_152220_planned.csv"
+    filename_executed = "trajectory_20250721_152220_executed.csv"
+    filename_reduced = "trajectory_20250721_152220_reduced_PTP.csv"
+    mode = "joint"
 
     filepath_planned = os.path.join(data_dir, filename_planned)
     filepath_executed = os.path.join(data_dir, filename_executed)
