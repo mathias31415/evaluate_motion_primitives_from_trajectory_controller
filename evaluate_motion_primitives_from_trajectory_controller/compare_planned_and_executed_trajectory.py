@@ -24,15 +24,15 @@ import os
 
 
 def compare_and_plot_joint_trajectories(
-    filepath_planned, filepath_executed, joint_pos_names, n_points
+    filepath_planned, filepath_executed, joint_pos_names, n_points, vel_threshold=0.0
 ):
     # Load CSV files
     df_planned = pd.read_csv(filepath_planned)
     df_executed = pd.read_csv(filepath_executed)
 
-    # Remove leading/trailing rows of executed trajectory where all velocities are zero
+    # Remove leading/trailing rows of executed trajectory where all velocities are below the threshold
     vel_cols = [col for col in df_executed.columns if "vel" in col]
-    moving_mask = ~(df_executed[vel_cols] == 0).all(axis=1)
+    moving_mask = ~(df_executed[vel_cols] <= vel_threshold).all(axis=1)
     start_index = moving_mask.idxmax()
     end_index = moving_mask[::-1].idxmax()
     df_executed_clean = df_executed.loc[start_index:end_index].reset_index(drop=True)
