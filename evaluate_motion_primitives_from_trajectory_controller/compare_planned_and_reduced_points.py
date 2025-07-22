@@ -35,13 +35,18 @@ def plot_cartesian_trajectory(filepath_planned, filepath_reduced, pose_names):
     x, y, z = df_planned[px], df_planned[py], df_planned[pz]
     xr, yr, zr = df_reduced[px], df_reduced[py], df_reduced[pz]
 
+    # Add the first point of the planned trajectory to the reduced trajectory (start point)
+    xr_full = np.insert(xr.values, 0, x.iloc[0])
+    yr_full = np.insert(yr.values, 0, y.iloc[0])
+    zr_full = np.insert(zr.values, 0, z.iloc[0])
+
     # Prepare 3D plot
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection="3d")
 
     # Plot planned and reduced paths
     ax.plot(x, y, z, marker="o", markersize=5, label="Planned Path", color="blue", alpha=0.5)
-    ax.plot(xr, yr, zr, marker="o", markersize=5, label="Reduced Path", color="orange")
+    ax.plot(xr_full, yr_full, zr_full, marker="o", markersize=5, label="Reduced Path", color="orange")
 
     # Mark start and end of the planned path
     ax.scatter(x.iloc[0], y.iloc[0], z.iloc[0], color="red", s=50, label="Start")
