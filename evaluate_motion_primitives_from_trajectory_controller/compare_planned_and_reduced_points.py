@@ -104,7 +104,7 @@ def plot_cartesian_trajectory(filepath_planned, filepath_reduced, pose_names):
     ax.set_xlabel("X in m")
     ax.set_ylabel("Y in m")
     ax.set_zlabel("Z in m")
-    ax.set_title("Cartesian Trajectory: Planned vs. Reduced")
+    # ax.set_title("Cartesian Trajectory: Planned vs. Reduced")
     ax.legend()
 
     # Set equal aspect ratio for all axes

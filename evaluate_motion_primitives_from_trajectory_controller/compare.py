@@ -92,16 +92,16 @@ def main():
     # filename_reduced = "trajectory_20250721_152220_reduced_PTP.csv"
     # mode = "joint"
 
-    filename_planned = "trajectory_20250722_124049_planned.csv"
-    filename_executed = "trajectory_20250722_124049_executed.csv"
-    filename_reduced = "trajectory_20250722_124049_reduced_LIN.csv"
-    mode = "cartesian"
+    # filename_planned = "trajectory_20250722_124049_planned.csv"
+    # filename_executed = "trajectory_20250722_124049_executed.csv"
+    # filename_reduced = "trajectory_20250722_124049_reduced_LIN.csv"
+    # mode = "cartesian"
 
     ### KUKA ###
-    # filename_planned = "trajectory_20250722_094638_planned.csv"
-    # filename_executed = "trajectory_20250722_094638_executed.csv"
-    # filename_reduced = "trajectory_20250722_094638_reduced_PTP.csv"
-    # mode = "joint"
+    filename_planned = "trajectory_20250722_094638_planned.csv"
+    filename_executed = "trajectory_20250722_094638_executed.csv"
+    filename_reduced = "trajectory_20250722_094638_reduced_PTP.csv"
+    mode = "joint"
 
     # filename_planned = "trajectory_20250722_095053_planned.csv"
     # filename_executed = "trajectory_20250722_095053_executed.csv"
