@@ -86,6 +86,8 @@ def compare_and_plot_joint_trajectories(
 
     axs[-1].set_xlabel("Normalized Trajectory Index")
 
+    # axs[-1].set_ylim(-7, 0)
+
     # Global legend
     fig.legend(
         ["Planned", "Executed"],
@@ -206,9 +208,13 @@ def compare_and_plot_cartesian_trajectories(
 
 
 def main():
-    data_dir = "src/evaluate_motion_primitives_from_trajectory_controller/data"
-    filename_planned = "trajectory_<date>_planned.csv"
-    filename_executed = "trajectory_<date>_executed.csv"
+    # data_dir = "src/evaluate_motion_primitives_from_trajectory_controller/data"
+    # filename_planned = "trajectory_<date>_planned.csv"
+    # filename_executed = "trajectory_<date>_executed.csv"
+    data_dir = "data"
+    filename_planned = "trajectory_20250722_124049_planned.csv"
+    filename_executed = "trajectory_20250722_124049_executed.csv"
+
     filepath_planned = os.path.join(data_dir, filename_planned)
     filepath_executed = os.path.join(data_dir, filename_executed)
     joint_pos_names = [
@@ -220,9 +226,10 @@ def main():
         "wrist_3_joint_pos",
     ]
     n_points = 100
+    vel_threshold=0.1
 
     compare_and_plot_joint_trajectories(
-        filepath_planned, filepath_executed, joint_pos_names, n_points
+        filepath_planned, filepath_executed, joint_pos_names, n_points, vel_threshold
     )
 
 
