@@ -52,7 +52,7 @@ def compare_and_plot_joint_trajectories(
     # Compute RMSE per joint and total
     rmse = np.sqrt(np.mean((planned_resampled - executed_resampled) ** 2, axis=0))
     total_rmse = np.sqrt(np.mean((planned_resampled - executed_resampled) ** 2))
-    print(f"Total RMSE of planned and executed trajectory: {total_rmse:.6f}")
+    print(f"Total RMSE of planned and executed trajectory: {total_rmse:.4f} rad")
 
     # Plot in same style as reduced joint trajectory
     fig, axs = plt.subplots(
@@ -80,13 +80,13 @@ def compare_and_plot_joint_trajectories(
             label="Executed",
         )
         axs[i].set_ylabel("Angle in radians")
-        axs[i].set_title(f"{joint} (RMSE: {rmse[i]:.4f})")
+        axs[i].set_title(f"{joint} (RMSE: {rmse[i]:.4f} rad)")
         axs[i].set_ylim(-3.5, 3.5)
         axs[i].grid(True)
 
     axs[-1].set_xlabel("Normalized Trajectory Index")
 
-    # axs[-1].set_ylim(-7, 0)
+    axs[-1].set_ylim(-7, 0)
 
     # Global legend
     fig.legend(
@@ -98,7 +98,7 @@ def compare_and_plot_joint_trajectories(
     )
 
     # Add total RMSE text below the last plot
-    fig.text(0.5, 0.01, f"Total RMSE: {total_rmse:.6f}", ha="center", fontsize=14, style="italic")
+    fig.text(0.5, 0.01, f"Total RMSE: {total_rmse:.4f} rad", ha="center", fontsize=14, style="italic")
 
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
@@ -113,11 +113,19 @@ def compare_and_plot_joint_trajectories(
 
 
 def compare_and_plot_cartesian_trajectories(
-    filepath_planned, filepath_executed, cart_pos_names, n_points
+    filepath_planned, filepath_executed, cart_pos_names, n_points, vel_threshold=0.0
 ):
     # Load CSV files
     df_planned = pd.read_csv(filepath_planned)
     df_executed = pd.read_csv(filepath_executed)
+
+    # Remove leading/trailing rows where all velocities are below the threshold
+    vel_cols = [col for col in df_executed.columns if "vel" in col]
+    if vel_cols and vel_threshold > 0.0:
+        moving_mask = ~(df_executed[vel_cols] <= vel_threshold).all(axis=1)
+        start_index = moving_mask.idxmax()
+        end_index = moving_mask[::-1].idxmax()
+        df_executed = df_executed.loc[start_index:end_index].reset_index(drop=True)
 
     # Use only the first three values (x, y, z)
     pos_names = cart_pos_names[:3]
@@ -126,46 +134,26 @@ def compare_and_plot_cartesian_trajectories(
     planned_positions = df_planned[pos_names].values
     executed_positions = df_executed[pos_names].values
 
-    # Resample planned trajectory (linear interpolation)
+    # Resample both trajectories (linear interpolation)
     interp_planned = interp1d(np.linspace(0, 1, len(planned_positions)), planned_positions, axis=0)
+    interp_executed = interp1d(np.linspace(0, 1, len(executed_positions)), executed_positions, axis=0)
     planned_resampled = interp_planned(np.linspace(0, 1, n_points))
-
-    # Resample executed trajectory
-    interp_executed = interp1d(
-        np.linspace(0, 1, len(executed_positions)), executed_positions, axis=0
-    )
     executed_resampled = interp_executed(np.linspace(0, 1, n_points))
 
     # Calculate 3D RMSE
-    diffs = planned_resampled - executed_resampled
-    squared_distances = np.sum(diffs**2, axis=1)
-    rmse_3d = np.sqrt(np.mean(squared_distances))
-    print(f"3D RMSE of planned and executed trajectory: {rmse_3d:.6f}")
+    # diffs = planned_resampled - executed_resampled
+    # squared_distances = np.sum(diffs**2, axis=1)
+    # rmse_3d = np.sqrt(np.mean(squared_distances))
+    # print(f"RMSE of Cartesian distance (x, y, z): {rmse_3d:.4f} m")
+    # RMSE not meaningful here, as points are sampled temporally and not spatially
 
     # 3D Plot
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection="3d")
-
-    ax.plot(
-        planned_resampled[:, 0],
-        planned_resampled[:, 1],
-        planned_resampled[:, 2],
-        "o-",
-        color="blue",
-        alpha=0.6,
-        label="Planned",
-        markersize=4,
-    )
-    ax.plot(
-        executed_resampled[:, 0],
-        executed_resampled[:, 1],
-        executed_resampled[:, 2],
-        "o-",
-        color="red",
-        alpha=0.6,
-        label="Executed",
-        markersize=4,
-    )
+    ax.plot(planned_resampled[:, 0], planned_resampled[:, 1], planned_resampled[:, 2],
+            "o-", color="blue", alpha=0.6, label="Planned", markersize=4)
+    ax.plot(executed_resampled[:, 0], executed_resampled[:, 1], executed_resampled[:, 2],
+            "o-", color="red", alpha=0.6, label="Executed", markersize=4)
 
     ax.set_xlabel("X in m")
     ax.set_ylabel("Y in m")
@@ -193,7 +181,8 @@ def compare_and_plot_cartesian_trajectories(
     ax.set_zlim(min_limit, max_limit)
 
     # ax.set_title('Cartesian Trajectories Comparison')
-    fig.text(0.5, 0.01, f"RMSE: {rmse_3d:.6f}", ha="center", fontsize=14, style="italic")
+    # fig.text(0.5, 0.01, f"RMSE: {rmse_3d:.4f} m", ha="center", fontsize=14, style="italic")
+    # RMSE not meaningful here, as points are sampled temporally and not spatially
     ax.legend()
     ax.grid(True)
 
@@ -208,12 +197,9 @@ def compare_and_plot_cartesian_trajectories(
 
 
 def main():
-    # data_dir = "src/evaluate_motion_primitives_from_trajectory_controller/data"
-    # filename_planned = "trajectory_<date>_planned.csv"
-    # filename_executed = "trajectory_<date>_executed.csv"
-    data_dir = "data"
-    filename_planned = "trajectory_20250722_124049_planned.csv"
-    filename_executed = "trajectory_20250722_124049_executed.csv"
+    data_dir = "src/evaluate_motion_primitives_from_trajectory_controller/data"
+    filename_planned = "trajectory_<date>_planned.csv"
+    filename_executed = "trajectory_<date>_executed.csv"
 
     filepath_planned = os.path.join(data_dir, filename_planned)
     filepath_executed = os.path.join(data_dir, filename_executed)

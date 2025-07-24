@@ -52,10 +52,10 @@ def main():
     # filename_reduced = "trajectory_20250715_114057_reduced_LIN.csv"
     # mode = "cartesian"
 
-    # filename_planned = "trajectory_20250716_090701_planned.csv"
-    # filename_executed = "trajectory_20250716_090701_executed.csv"
-    # filename_reduced = "trajectory_20250716_090701_reduced_LIN.csv"
-    # mode = "cartesian"
+    filename_planned = "trajectory_20250716_090701_planned.csv"
+    filename_executed = "trajectory_20250716_090701_executed.csv"
+    filename_reduced = "trajectory_20250716_090701_reduced_LIN.csv"
+    mode = "cartesian"
 
     # filename_planned = "trajectory_20250716_091324_planned.csv"
     # filename_executed = "trajectory_20250716_091324_executed.csv"
@@ -92,10 +92,10 @@ def main():
     # filename_reduced = "trajectory_20250721_152220_reduced_PTP.csv"
     # mode = "joint"
 
-    filename_planned = "trajectory_20250722_124049_planned.csv"
-    filename_executed = "trajectory_20250722_124049_executed.csv"
-    filename_reduced = "trajectory_20250722_124049_reduced_LIN.csv"
-    mode = "cartesian"
+    # filename_planned = "trajectory_20250722_124049_planned.csv"
+    # filename_executed = "trajectory_20250722_124049_executed.csv"
+    # filename_reduced = "trajectory_20250722_124049_reduced_LIN.csv"
+    # mode = "cartesian"
 
     ### KUKA ###
     # filename_planned = "trajectory_20250722_094638_planned.csv"
@@ -162,7 +162,7 @@ def main():
     filepath_executed = os.path.join(data_dir, filename_executed)
     filepath_reduced = os.path.join(data_dir, filename_reduced)
 
-    ### UR ###
+    ## UR ###
     joint_names = [
         "shoulder_pan_joint",
         "shoulder_lift_joint",
@@ -256,10 +256,10 @@ def main():
 
     # compare planned and executed trajectory
     compare_and_plot_joint_trajectories(
-        filepath_planned, filepath_executed, joint_pos_names, n_points=100, vel_threshold = joint_vel_threshold
+        filepath_planned, filepath_executed, joint_pos_names, n_points=100, vel_threshold=joint_vel_threshold
     )
     compare_and_plot_cartesian_trajectories(
-        filepath_planned, filepath_executed, pose_names, n_points=200
+        filepath_planned, filepath_executed, pose_names, n_points=100, vel_threshold=joint_vel_threshold
     )
 
 
