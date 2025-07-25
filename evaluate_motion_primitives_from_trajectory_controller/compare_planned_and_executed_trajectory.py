@@ -86,7 +86,7 @@ def compare_and_plot_joint_trajectories(
 
     axs[-1].set_xlabel("Normalized Trajectory Index")
 
-    # axs[-1].set_ylim(-7, 0)
+    axs[-1].set_ylim(-7, 0)
 
     # Global legend
     axs[-1].legend(
