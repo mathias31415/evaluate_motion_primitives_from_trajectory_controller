@@ -180,12 +180,12 @@ def plot_joint_trajectory(filepath_planned, filepath_reduced, joint_names):
 
     # fig.suptitle("Joint Trajectory: Planned vs. Reduced", fontsize=14)
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    fig.legend(
-        ["Planned", "Reduced"],
-        loc="lower right",
-        bbox_to_anchor=(1, 0),
-        bbox_transform=fig.transFigure,
+ 
+    axs[-1].legend(
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.25),
         ncol=2,
+        frameon=False
     )
 
     # Save figure
