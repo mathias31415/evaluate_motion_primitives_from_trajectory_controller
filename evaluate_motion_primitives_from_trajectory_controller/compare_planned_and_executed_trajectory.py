@@ -80,27 +80,33 @@ def compare_and_plot_joint_trajectories(
             label="Executed",
         )
         axs[i].set_ylabel("Angle in radians")
-        axs[i].set_title(f"{joint} (RMSE: {rmse[i]:.4f} rad)")
+        axs[i].set_title(f"{joint}")
         axs[i].set_ylim(-3.5, 3.5)
         axs[i].grid(True)
 
     axs[-1].set_xlabel("Normalized Trajectory Index")
 
-    axs[-1].set_ylim(-7, 0)
+    # axs[-1].set_ylim(-7, 0)
 
     # Global legend
-    fig.legend(
-        ["Planned", "Executed"],
-        loc="lower right",
-        bbox_to_anchor=(1, 0),
-        bbox_transform=fig.transFigure,
+    axs[-1].legend(
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.25),
         ncol=2,
+        frameon=False
     )
 
-    # Add total RMSE text below the last plot
-    fig.text(0.5, 0.01, f"Total RMSE: {total_rmse:.4f} rad", ha="center", fontsize=14, style="italic")
+    # Add RMSE info below the last plot
+    rmse_text = "\n".join([f"{joint}: {r:.4f} rad" for joint, r in zip(joint_pos_names, rmse)])
+    rmse_text += f"\nTotal RMSE: {total_rmse:.4f} rad"
 
-    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    fig.text(
+        0.5, 0.02, rmse_text,
+        ha="center", va="bottom",
+        fontsize=8, style="italic"
+    )
+
+    plt.tight_layout(rect=[0, 0.08, 1, 0.95])
 
     # Save figure
     base_name = os.path.basename(filepath_planned).replace(
@@ -135,18 +141,43 @@ def compare_and_plot_cartesian_trajectories(
     executed_positions = df_executed[pos_names].values
 
     # Resample both trajectories (linear interpolation)
-    interp_planned = interp1d(np.linspace(0, 1, len(planned_positions)), planned_positions, axis=0)
-    interp_executed = interp1d(np.linspace(0, 1, len(executed_positions)), executed_positions, axis=0)
-    planned_resampled = interp_planned(np.linspace(0, 1, n_points))
-    executed_resampled = interp_executed(np.linspace(0, 1, n_points))
+    # interp_planned = interp1d(np.linspace(0, 1, len(planned_positions)), planned_positions, axis=0)
+    # interp_executed = interp1d(np.linspace(0, 1, len(executed_positions)), executed_positions, axis=0)
+    # planned_resampled = interp_planned(np.linspace(0, 1, n_points))
+    # executed_resampled = interp_executed(np.linspace(0, 1, n_points))
+    
+    # Compute arc-length-parametrized distances
+    s_planned = compute_arc_length_parametrization(planned_positions)
+    s_executed = compute_arc_length_parametrization(executed_positions)
+
+    # remove duplicate points
+    s_planned, planned_positions = remove_duplicate_points(s_planned, planned_positions)
+    s_executed, executed_positions = remove_duplicate_points(s_executed, executed_positions)
+
+    if len(s_planned) < 2 or len(s_executed) < 2:
+        raise ValueError("Too few unique points after removing duplicates.")
+
+    # Interpolators with cartesian (not temporal) parametrization
+    interp_planned = interp1d(s_planned, planned_positions, axis=0, kind='linear')
+    interp_executed = interp1d(s_executed, executed_positions, axis=0, kind='linear')
+
+    # Uniform sampling along the path (e.g. 100 points)
+    arc_points = np.linspace(0, 1, n_points)
+    planned_resampled = interp_planned(arc_points)
+    executed_resampled = interp_executed(arc_points)
+
+    print(f"Planned trajectory length: {len(planned_positions)}")
+    print(f"Executed trajectory length: {len(executed_positions)}")
+    print(f"Planned arc total length: {np.linalg.norm(planned_positions[-1] - planned_positions[0]):.4f} m")
+    print(f"Executed arc total length: {np.linalg.norm(executed_positions[-1] - executed_positions[0]):.4f} m")
+
 
     # Calculate 3D RMSE
-    # diffs = planned_resampled - executed_resampled
-    # squared_distances = np.sum(diffs**2, axis=1)
-    # rmse_3d = np.sqrt(np.mean(squared_distances))
-    # print(f"RMSE of Cartesian distance (x, y, z): {rmse_3d:.4f} m")
-    # RMSE not meaningful here, as points are sampled temporally and not spatially
-
+    diffs = planned_resampled - executed_resampled
+    squared_distances = np.sum(diffs**2, axis=1)
+    rmse_3d = np.sqrt(np.mean(squared_distances))
+    print(f"RMSE of Cartesian distance (x, y, z): {rmse_3d:.4f} m")
+    
     # 3D Plot
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection="3d")
@@ -181,8 +212,7 @@ def compare_and_plot_cartesian_trajectories(
     ax.set_zlim(min_limit, max_limit)
 
     # ax.set_title('Cartesian Trajectories Comparison')
-    # fig.text(0.5, 0.01, f"RMSE: {rmse_3d:.4f} m", ha="center", fontsize=14, style="italic")
-    # RMSE not meaningful here, as points are sampled temporally and not spatially
+    fig.text(0.5, 0.01, f"RMSE: {rmse_3d:.4f} m", ha="center", fontsize=14, style="italic")
     ax.legend()
     ax.grid(True)
 
@@ -194,6 +224,31 @@ def compare_and_plot_cartesian_trajectories(
     plt.savefig(plot_path)
     plt.show()
     print(f"3D figure with cartesian trajectory comparison saved to: {plot_path}")
+
+# def compute_arc_length_parametrization(positions):
+#     """Compute cumulative arc length and normalize to [0, 1]."""
+#     diffs = np.diff(positions, axis=0)
+#     dists = np.linalg.norm(diffs, axis=1)
+#     arc_lengths = np.concatenate([[0], np.cumsum(dists)])
+#     normalized_arc = arc_lengths / arc_lengths[-1]
+#     return normalized_arc
+
+def compute_arc_length_parametrization(positions):
+    if len(positions) < 2:
+        raise ValueError("Need at least two points for arc-length parametrization.")
+    diffs = np.diff(positions, axis=0)
+    dists = np.linalg.norm(diffs, axis=1)
+    total_length = np.sum(dists)
+    if total_length == 0:
+        raise ValueError("Arc length is zero. All positions are identical.")
+    arc_lengths = np.concatenate([[0], np.cumsum(dists)])
+    normalized_arc = arc_lengths / arc_lengths[-1]
+    return normalized_arc
+
+def remove_duplicate_points(s, positions):
+    """Remove points with duplicate s values (required for interp1d)."""
+    _, unique_indices = np.unique(s, return_index=True)
+    return s[unique_indices], positions[unique_indices]
 
 
 def main():

@@ -52,10 +52,10 @@ def main():
     # filename_reduced = "trajectory_20250715_114057_reduced_LIN.csv"
     # mode = "cartesian"
 
-    filename_planned = "trajectory_20250716_090701_planned.csv"
-    filename_executed = "trajectory_20250716_090701_executed.csv"
-    filename_reduced = "trajectory_20250716_090701_reduced_LIN.csv"
-    mode = "cartesian"
+    # filename_planned = "trajectory_20250716_090701_planned.csv"
+    # filename_executed = "trajectory_20250716_090701_executed.csv"
+    # filename_reduced = "trajectory_20250716_090701_reduced_LIN.csv"
+    # mode = "cartesian"
 
     # filename_planned = "trajectory_20250716_091324_planned.csv"
     # filename_executed = "trajectory_20250716_091324_executed.csv"
@@ -163,42 +163,42 @@ def main():
     filepath_reduced = os.path.join(data_dir, filename_reduced)
 
     ## UR ###
-    joint_names = [
-        "shoulder_pan_joint",
-        "shoulder_lift_joint",
-        "elbow_joint",
-        "wrist_1_joint",
-        "wrist_2_joint",
-        "wrist_3_joint",
-    ]
-    joint_pos_names = [
-        "shoulder_pan_joint_pos",
-        "shoulder_lift_joint_pos",
-        "elbow_joint_pos",
-        "wrist_1_joint_pos",
-        "wrist_2_joint_pos",
-        "wrist_3_joint_pos",
-    ]
-    joint_vel_threshold = 0.01
-
-    ### KUKA ###
     # joint_names = [
-    #     "joint_a1",
-    #     "joint_a2",
-    #     "joint_a3",
-    #     "joint_a4",
-    #     "joint_a5",
-    #     "joint_a6",
+    #     "shoulder_pan_joint",
+    #     "shoulder_lift_joint",
+    #     "elbow_joint",
+    #     "wrist_1_joint",
+    #     "wrist_2_joint",
+    #     "wrist_3_joint",
     # ]
     # joint_pos_names = [
-    #     "joint_a1_pos",
-    #     "joint_a2_pos",
-    #     "joint_a3_pos",
-    #     "joint_a4_pos",
-    #     "joint_a5_pos",
-    #     "joint_a6_pos",
+    #     "shoulder_pan_joint_pos",
+    #     "shoulder_lift_joint_pos",
+    #     "elbow_joint_pos",
+    #     "wrist_1_joint_pos",
+    #     "wrist_2_joint_pos",
+    #     "wrist_3_joint_pos",
     # ]
-    # joint_vel_threshold = 1.0
+    # joint_vel_threshold = 0.001
+
+    ### KUKA ###
+    joint_names = [
+        "joint_a1",
+        "joint_a2",
+        "joint_a3",
+        "joint_a4",
+        "joint_a5",
+        "joint_a6",
+    ]
+    joint_pos_names = [
+        "joint_a1_pos",
+        "joint_a2_pos",
+        "joint_a3_pos",
+        "joint_a4_pos",
+        "joint_a5_pos",
+        "joint_a6_pos",
+    ]
+    joint_vel_threshold = 1.0
 
     pose_names = ["pose_x", "pose_y", "pose_z", "pose_qx", "pose_qy", "pose_qz", "pose_qw"]
 

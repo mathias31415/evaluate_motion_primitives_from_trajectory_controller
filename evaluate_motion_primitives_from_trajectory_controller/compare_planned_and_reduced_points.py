@@ -176,7 +176,7 @@ def plot_joint_trajectory(filepath_planned, filepath_reduced, joint_names):
 
     axs[-1].set_xlabel("Trajectory Point Index")
 
-    axs[-1].set_ylim(-7, 0)
+    # axs[-1].set_ylim(-7, 0)
 
     # fig.suptitle("Joint Trajectory: Planned vs. Reduced", fontsize=14)
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
